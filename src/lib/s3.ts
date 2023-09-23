@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import toast from 'react-hot-toast';
 
 export async function uploadToS3(file: File) {
     try {
@@ -25,7 +26,8 @@ export async function uploadToS3(file: File) {
         }).promise();
 
         await upload.then(data => {
-            console.log('upload success', file_key)
+            toast.success('File uploaded successfully')
+            // console.log('upload success', file_key)
         })
 
         return Promise.resolve({

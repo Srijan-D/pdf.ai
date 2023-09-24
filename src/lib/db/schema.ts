@@ -10,6 +10,7 @@ export const chats = pgTable('chats', {
     userId: varchar('user_id', { length: 255 }).notNull(),
     fileKey: text('file_key').notNull(),
 })
+export type DrizzleChat = typeof chats.$inferSelect
 
 
 export const messages = pgTable('messages', {

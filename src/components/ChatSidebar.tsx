@@ -29,10 +29,17 @@ const ChatSidebar = ({ chats, chatId }: Props) => {
                                 "hover:text-white hover:bg-blue-600": chat.id !== chatId,
                             })}>
                             <MessageCircle className="mr-2" />
-                            <p>{chat.pdfName}</p>
+                            <p className="w-full overflow-hidden text-sm truncate whitespace-nowrap text-ellipsis">{chat.pdfName}</p>
                         </div>
                     </Link>
                 ))}
+            </div>
+
+            <div className="absolute bottom-4 left-4">
+                <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+                    <Link href='/'>Home </Link>
+                    <Link href='/'>About </Link>
+                </div>
             </div>
         </div>
     )

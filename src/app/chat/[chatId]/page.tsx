@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { chats } from "@/lib/db/schema";
 import { eq } from 'drizzle-orm';
 import ChatSidebar from '@/components/ChatSidebar';
+import PDFViewer from '@/components/PDFViewer';
 
 type Props = {
     params: {
@@ -25,13 +26,17 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
         return redirect('/')
     }
 
+    const currentChat = chatList.find(chat => chat.id === parseInt(chatId))
+
     return (
         <div className='flex max-h-screen overflow-hidden'>
             <div className='flex w-full max-h-screen overflow-hidden'>
                 <div className='flex-[1] max-w-xs'>
                     <ChatSidebar chats={chatList} chatId={parseInt(chatId)} />
                 </div>{/* chat sidebar */}
-                <div className='max-h-screen p-4 overflow-scroll flex-[5]'></div>{/* main pdf*/}
+                <div className='max-h-screen p-4 overflow-scroll flex-[5]'>
+                    <PDFViewer pdf_url={currentChat?.pdfUrl || ''} />
+                </div>{/* main pdf*/}
                 <div className='flex-3 border-l-4 border-l-slate-200'></div>{/* chat box */}
             </div>
         </div>

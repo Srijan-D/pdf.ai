@@ -42,7 +42,7 @@ export async function loadS3IntoPinecone(fileKey: string) {
 
     //now we upload the vectors to pinecone
     const client = await getPineconeClient();
-    const pineconeIndex = await client.index("ai-pdf");
+    const pineconeIndex = await client.Index("ai-pdf");
     const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
     console.log("uploading to pinecone...")
 

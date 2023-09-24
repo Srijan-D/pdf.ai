@@ -8,7 +8,7 @@ export async function downloadFromS3(file_key: string) {
         });
         const s3 = new AWS.S3({
             params: {
-                Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME
+                Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME3333
             },
             region: "ap-south-1"
         });
@@ -16,12 +16,11 @@ export async function downloadFromS3(file_key: string) {
             Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
             Key: file_key,
         }
-
         const obj = await s3.getObject(params).promise();
-        const file_name = `/temp/pdf/${Date.now().toString()}.pdf`
+        const file_name = `D:/Codes/temp/pdf-${Date.now()}.pdf`
+
         fs.writeFileSync(file_name, obj.Body as Buffer) // write the file to the temp folder Buffer for Typescript
         return file_name;
-
     } catch (error) {
         console.log(error)
         return null;

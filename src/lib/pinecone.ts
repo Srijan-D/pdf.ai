@@ -1,7 +1,10 @@
-import { Pinecone } from '@pinecone-database/pinecone'
+import { Pinecone, Vector, utils as PineconeUtils, PineconeRecord } from '@pinecone-database/pinecone'
 import { downloadFromS3 } from './s3-server';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { Document, RecursiveCharacterTextSplitter } from '@pinecone-database/doc-splitter'
+import { getEmbeddings } from './embeddings';
+import md5 from 'md5';
+import { convertToAscii } from './utils';
 // import { Text } from 'lucide-react';
 
 let pinecone: Pinecone | null = null;
@@ -29,16 +32,48 @@ export async function loadS3IntoPinecone(fileKey: string) {
     if (!file_name) {
         throw new Error("unable to download file from s3")
     }
-    const loader = new PDFLoader(file_name)
-    const pages = (await loader.load()) as PDFPage[]
+    const loader = new PDFLoader(file_name);
+    const pages = (await loader.load()) as PDFPage[];
+    //now we split the document into smaller segments
+    const documents = await Promise.all(pages.map(prepareDocument));
 
-    //now we split the document into smaller chunks
-    const documents = await Promise.all(pages.map(prepareDocument))
+    //vectorize and embed each document
+    const vectors = await Promise.all(documents.flat().map(embedDocument));
+
+    //now we upload the vectors to pinecone
+    const client = await getPineconeClient();
+    const pineconeIndex = await client.index("ai-pdf");
+    const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
+    console.log("uploading to pinecone...")
+
+    await namespace.upsert(vectors);
+    return documents[0];
+}
+async function embedDocument(doc: Document) {
+    try {
+        const embeddings = await getEmbeddings(doc.pageContent)
+        const hash = md5(doc.pageContent)//this is the unique id for the document
+        return {
+            id: hash,
+            values: embeddings,
+            metadata: {
+                text: doc.metadata.text,
+                pageNumber: doc.metadata.pageNumber
+            }
+        } as PineconeRecord
+    } catch (error) {
+        console.log(error)
+        throw new Error("unable to embed document")
+    }
 }
 
 export const truncateStringByBytes = (str: string, bytes: number) => {
     const enc = new TextEncoder();
-    return new TextDecoder('utf-8').decode(enc.encode(str).slice(0, bytes));
+    const encodedBytes = enc.encode(str);
+    const truncatedBytes = encodedBytes.slice(0, bytes);
+    const decoder = new TextDecoder('utf-8');
+    const truncatedString = decoder.decode(truncatedBytes);
+    return truncatedString;
 }
 
 

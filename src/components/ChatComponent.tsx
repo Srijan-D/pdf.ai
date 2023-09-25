@@ -1,15 +1,29 @@
 "use client"
+import { useEffect } from 'react'
 import { useChat } from 'ai/react'
-import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Send } from 'lucide-react'
+import { Input } from "./ui/input"
 import MessageList from './MessageList'
-type Props = {}
+type Props = { chatId: number }
 
-const ChatComponent = (props: Props) => {
+const ChatComponent = ({ chatId }: Props) => {
     const { input, handleInputChange, handleSubmit, messages } = useChat({
-        api: '/api/chat'
+        api: '/api/chat',
+        body: {
+            chatId
+        }
     })
+    useEffect(() => {
+        const messageContainer = document.getElementById('message-container')
+        if (messageContainer) {
+            messageContainer.scrollTo({
+                top: messageContainer.scrollHeight,
+                behavior: 'smooth'
+            })
+        }
+    })
+
     return (
         <div
             className="relative max-h-screen overflow-hidden"
@@ -22,7 +36,6 @@ const ChatComponent = (props: Props) => {
 
             {/* message list */}
             <MessageList messages={messages} />
-
             <form
                 onSubmit={handleSubmit}
                 className="sticky bottom-0 inset-x-0 px-2 py-4 bg-white"

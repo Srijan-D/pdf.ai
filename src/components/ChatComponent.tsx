@@ -7,11 +7,13 @@ import { Input } from "./ui/input"
 import MessageList from './MessageList'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
-import { Message } from 'ai/react'
+import { Message } from 'ai'
+
 type Props = { chatId: number }
 
 const ChatComponent = ({ chatId }: Props) => {
-    const { data } = useQuery({
+
+    const { data, isLoading } = useQuery({
         queryKey: ["chats", chatId],
         queryFn: async () => {
             const response = await axios.post<Message[]>('/api/create-chat', { chatId })
@@ -38,6 +40,7 @@ const ChatComponent = ({ chatId }: Props) => {
 
     return (
         <div
+
             className="relative max-h-screen overflow-hidden"
             id="message-container"
         >
@@ -47,7 +50,7 @@ const ChatComponent = ({ chatId }: Props) => {
             </div>
 
             {/* message list */}
-            <MessageList messages={messages} />
+            <MessageList messages={messages} isLoading={isLoading} />
             <form
                 onSubmit={handleSubmit}
                 className="sticky bottom-0 inset-x-0 px-2 py-4 bg-white"

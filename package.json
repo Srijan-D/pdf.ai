@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "Set NODE_OPTIONS='--max-old-space-size=8192' && next dev",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+     "aws-sdk": "^2.1450.0",
     "@clerk/nextjs": "^4.24.1",
     "@neondatabase/serverless": "^0.6.0",
     "@pinecone-database/doc-splitter": "^0.0.1",
@@ -21,10 +22,10 @@
     "@types/react-dom": "18.2.7",
     "ai": "^2.2.13",
     "autoprefixer": "10.4.16",
-    "aws-sdk": "^2.1463.0",
     "axios": "^1.5.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "drizzle-kit": "^0.19.13",
     "drizzle-orm": "^0.28.6",

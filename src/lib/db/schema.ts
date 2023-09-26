@@ -21,6 +21,16 @@ export const messages = pgTable('messages', {
     role: userSystemEnum('role').notNull(),
 })
 
+
+export const userSubscriptions = pgTable('user_subscriptions', {
+    id: serial('id').primaryKey(),
+    userId: varchar('user_id', { length: 255 }).notNull().unique(),
+    stripeCustomerId: varchar('stripe_customer_id', { length: 255 }).notNull().unique(),
+    subscriptionId: varchar('subscription_id', { length: 255 }).unique(),
+    stripePriceId: varchar('stripe_price_id', { length: 255 }),
+    stripeCurrentPeriodEnd: timestamp('stripe_current_period_end'),
+})
+
 // drizzle orm is what interacts with the database
 
 //drizzle kit is used for migrations 

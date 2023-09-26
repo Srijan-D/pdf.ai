@@ -1,33 +1,29 @@
-import { Configuration, OpenAIApi } from 'openai-edge'
-import { OpenAIStream, StreamingTextResponse, Message } from 'ai'
-import { NextResponse } from 'next/server'
-import { getContext } from '@/lib/context'
-import { db } from '@/lib/db'
-import { eq } from 'drizzle-orm'
-import { chats } from '@/lib/db/schema'
-export const runtime = 'edge'
+import { Configuration, OpenAIApi } from "openai-edge";
+import { Message, OpenAIStream, StreamingTextResponse } from "ai";
+import { getContext } from "@/lib/context";
+import { db } from "@/lib/db";
+import { chats, messages as _messages } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
+export const runtime = "edge";
 
 const config = new Configuration({
-    apiKey: process.env.OPEN_AI_KEY
-})
-
-const openai = new OpenAIApi(config)
-
+    apiKey: process.env.OPEN_AI_KEY,
+});
+const openai = new OpenAIApi(config);
 
 export async function POST(req: Request) {
     try {
-        const { messages, chatId } = await req.json()
-        const lastMessage = messages[messages.length - 1]
-
-        const _chats = await db.select().from(chats).where(eq(chats.id, chatId))
-        const fileKey = _chats[0].fileKey
-        const context = await getContext(lastMessage.content, fileKey);
+        const { messages, chatId } = await req.json();
+        const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
         if (_chats.length != 1) {
-            return NextResponse.json(
-                { error: "invalid chat id" }, { status: 400 }
-            )
+            return NextResponse.json({ error: "chat not found" }, { status: 404 });
         }
+        const fileKey = _chats[0].fileKey;
+        const lastMessage = messages[messages.length - 1];
+        const context = await getContext(lastMessage.content, fileKey);
+
         const prompt = {
             role: "system",
             content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
@@ -46,20 +42,34 @@ export async function POST(req: Request) {
       `,
         };
 
-
         const response = await openai.createChatCompletion({
-            model: 'gpt-3.5-turbo',
-            prompt,
-            ...messages.filter((message: Message) => message.role === "user"),
+            model: "gpt-3.5-turbo",
+            messages: [
+                prompt,
+                ...messages.filter((message: Message) => message.role === "user"),
+            ],
             stream: true,
-        })
-        const stream = OpenAIStream(response)
-        return new StreamingTextResponse(stream)
-    } catch (error) {
-        console.error(error)
-        return NextResponse.json(
-            { error: "internal server error" }, { status: 500 }
-        )
+        });
+        const stream = OpenAIStream(response, {
+            onStart: async () => {
+                // save user message into db
 
-    }
+                await db.insert(_messages).values({
+                    chatId,
+                    content: lastMessage.content,
+                    role: "user",
+                });
+            },
+            onCompletion: async (completion) => {
+
+                // save ai message into db
+                await db.insert(_messages).values({
+                    chatId,
+                    content: completion,
+                    role: "system",
+                });
+            },
+        });
+        return new StreamingTextResponse(stream);
+    } catch (error) { }
 }

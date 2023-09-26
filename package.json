@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "set NODE_OPTIONS='--max-old-space-size=8192' && next dev",
+    "dev": "Set NODE_OPTIONS='--max-old-space-size=8192' && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -30,6 +30,7 @@
     "drizzle-orm": "^0.28.6",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.2",
+    "fs": "^0.0.1-security",
     "langchain": "^0.0.153",
     "lucide-react": "^0.279.0",
     "md5": "^2.3.0",

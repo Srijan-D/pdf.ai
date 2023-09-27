@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import ChatSidebar from '@/components/ChatSidebar';
 import PDFViewer from '@/components/PDFViewer';
 import ChatComponent from '@/components/ChatComponent';
+import { checkSubscription } from '@/lib/subscription'
 
 type Props = {
     params: {
@@ -15,6 +16,7 @@ type Props = {
 
 const ChatPage = async ({ params: { chatId } }: Props) => {
     const { userId } = await auth()
+    const isPro = await checkSubscription()
     if (!userId) {
         return redirect('/sign-in')
     }
@@ -33,7 +35,7 @@ const ChatPage = async ({ params: { chatId } }: Props) => {
         <div className='flex max-h-screen overflow-hidden'>
             <div className='flex w-full max-h-screen overflow-hidden'>
                 <div className='flex-[1] max-w-xs'>
-                    <ChatSidebar chats={chatList} chatId={parseInt(chatId)} />
+                    <ChatSidebar chats={chatList} chatId={parseInt(chatId)} isPro={isPro} />
                 </div>{/* chat sidebar */}
                 <div className='max-h-screen p-4  flex-[5]'>
                     <PDFViewer pdf_url={currentChat?.pdfUrl || ''} />

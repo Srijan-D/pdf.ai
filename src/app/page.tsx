@@ -1,12 +1,26 @@
 import { Button } from "@/components/ui/button"
 import { UserButton, auth } from "@clerk/nextjs"
-import Link from "next/link";
 import { LogIn } from "lucide-react"
 import FileUpload from "@/components/ui/FileUpload";
+import { checkSubscription } from "@/lib/subscription";
+import SubscriptionButton from "@/components/SubscriptionButton";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import Link from 'next/link'
+import { chats } from "@/lib/db/schema";
 
 export default async function Home() {
   const { userId } = await auth();
+  const isPro = await checkSubscription();
   const isAuth = !!userId;
+  let firstChat;
+  if (userId) {
+    firstChat = await db.select().from(chats).where(eq(chats.userId, userId))
+    if (firstChat) {
+      firstChat = firstChat[0]
+    }
+  }
+
   return (
     <div className="w-screen min-h-screen bg-gradient-to-r from-rose-100  to-teal-100">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -16,8 +30,13 @@ export default async function Home() {
             <UserButton afterSignOutUrl="/" />
           </div>
 
-          <div className="flex mt-2">
-            {isAuth && <Button>Go to Chats</Button>}
+          <div className="flex mt-3">
+            {isAuth && firstChat &&
+              <Link href={`/chat/${firstChat.id}`}>
+                <Button> Go to Chats</Button>
+              </Link>
+            }
+            <div className="ml-2"><SubscriptionButton isPro={isPro} /></div>
           </div>
           <p className="max-w-xl mt-2 text-base text-slate-600">
             AI-powered PDF Chatbot: Seamlessly converse with uploaded PDFs, extracting and discussing their content intelligently.
@@ -34,7 +53,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

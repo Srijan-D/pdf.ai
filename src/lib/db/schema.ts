@@ -22,14 +22,18 @@ export const messages = pgTable('messages', {
 })
 
 
-export const userSubscriptions = pgTable('user_subscriptions', {
-    id: serial('id').primaryKey(),
-    userId: varchar('user_id', { length: 255 }).notNull().unique(),
-    stripeCustomerId: varchar('stripe_customer_id', { length: 255 }).notNull().unique(),
-    subscriptionId: varchar('subscription_id', { length: 255 }).unique(),
-    stripePriceId: varchar('stripe_price_id', { length: 255 }),
-    stripeCurrentPeriodEnd: timestamp('stripe_current_period_end'),
-})
+export const userSubscriptions = pgTable("user_subscriptions", {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id", { length: 256 }).notNull().unique(),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 256 })
+        .notNull()
+        .unique(),
+    stripeSubscriptionId: varchar("stripe_subscription_id", {
+        length: 256,
+    }).unique(),
+    stripePriceId: varchar("stripe_price_id", { length: 256 }),
+    stripeCurrentPeriodEnd: timestamp("stripe_current_period_ended_at"),
+});
 
 // drizzle orm is what interacts with the database
 

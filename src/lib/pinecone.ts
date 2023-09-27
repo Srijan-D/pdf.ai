@@ -1,11 +1,10 @@
-import { Pinecone, Vector, utils as PineconeUtils, PineconeRecord } from '@pinecone-database/pinecone'
+import { Pinecone, Vector, PineconeRecord } from '@pinecone-database/pinecone'
 import { downloadFromS3 } from './s3-server';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { Document, RecursiveCharacterTextSplitter } from '@pinecone-database/doc-splitter'
 import { getEmbeddings } from './embeddings';
 import md5 from 'md5';
 import { convertToAscii } from './utils';
-// import { Text } from 'lucide-react';
 
 let pinecone: Pinecone | null = null;
 
@@ -18,6 +17,7 @@ export const getPineconeClient = async () => {
     }
     return pinecone;
 }
+
 type PDFPage = {
     pageContent: string,
     metadata: {
@@ -49,6 +49,7 @@ export async function loadS3IntoPinecone(fileKey: string) {
     await namespace.upsert(vectors);
     return documents[0];
 }
+
 async function embedDocument(doc: Document) {
     try {
         const embeddings = await getEmbeddings(doc.pageContent)
@@ -80,7 +81,7 @@ export const truncateStringByBytes = (str: string, bytes: number) => {
 async function prepareDocument(page: PDFPage) {
     let { pageContent, metadata } = page;
 
-    pageContent = pageContent.replace(/\n/g, '');
+    pageContent = pageContent.replace(/\n/g, '');//remove new lines
     //splitting the document 
     const splitter = new RecursiveCharacterTextSplitter();
     const docs = await splitter.splitDocuments([ //it is an array of documents

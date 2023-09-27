@@ -4,6 +4,7 @@ import { getContext } from "@/lib/context";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { chats, messages as dbMessages } from "@/lib/db/schema";
+import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 
 export const runtime = "edge";
@@ -13,7 +14,7 @@ const config = new Configuration({
 });
 const openai = new OpenAIApi(config);
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
 
         const { messages, chatId } = await req.json();
@@ -73,5 +74,9 @@ export async function POST(req: Request) {
             },
         });
         return new StreamingTextResponse(stream);
-    } catch (error) { }
+    } catch (error) {
+        return NextResponse.json(
+            { error: "internal server error" }, { status: 500 }
+        )
+    }
 }

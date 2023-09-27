@@ -66,7 +66,7 @@ const FileUpload = () => {
                     <>
                         <Loader2 className='w-8 h-8 text-blue-500 animate-spin' />
                         <p>
-                            GPT is thinking...
+                            GPT is going through your PDF...
                         </p>
                     </>
                 ) : (<>

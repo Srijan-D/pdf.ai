@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { loadS3IntoPinecone } from "@/lib/pinecone";
-import { get } from "http";
 import { getS3Url } from "@/lib/s3";
 import { NextResponse } from "next/server"
 import { chats } from "@/lib/db/schema";

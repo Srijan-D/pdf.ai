@@ -19,7 +19,7 @@ const SubscriptionButton = ({ isPro }: Props) => {
         }
     }
     return (
-        <Button disabled={loading} onClick={handleSubscription} className="border-white border-2 h-[2.7rem]">
+        <Button disabled={loading} onClick={handleSubscription} className=" border-2 ">
             {isPro ? "Manage subscriptions" : "Upgrade to Pro"}
         </Button>
     )

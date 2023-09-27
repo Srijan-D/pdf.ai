@@ -56,7 +56,7 @@ const FileUpload = () => {
     })
     return (
         <div className='p-4 bg-white rounded-xl'>
-            <div className=' border-dashed border-2 rounded-xl cursor-pointer flex flex-col items-center text-center bg-gray-50 py-8'
+            <div className=' border-dashed border-2 border-slate-500  rounded-xl cursor-pointer flex flex-col items-center text-center bg-gray-50 py-8'
                 {...getRootProps({
 
                 })}

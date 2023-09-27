@@ -22,23 +22,26 @@ export default async function Home() {
   }
 
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-r from-rose-100  to-teal-100">
+    <div className="w-screen min-h-screen bg-[conic-gradient(at_right,_var(--tw-gradient-stops))] from-red-900 via-violet-200 to-orange-500">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center ">
             <h1 className="mr-3 text-5xl font-semibold">Chat with your PDF</h1>
             <UserButton afterSignOutUrl="/" />
           </div>
-
           <div className="flex mt-3">
             {isAuth && firstChat &&
               <Link href={`/chat/${firstChat.id}`}>
-                <Button> Go to Chats</Button>
+                <Button className="border-2 "> Go to Chats</Button>
               </Link>
             }
-            <div className="ml-2"><SubscriptionButton isPro={isPro} /></div>
+            {isAuth &&
+              <div className="ml-2">
+                <SubscriptionButton isPro={isPro} />
+              </div>
+            }
           </div>
-          <p className="max-w-xl mt-2 text-base text-slate-600">
+          <p className="max-w-xl mt-2 text-base text-slate-700">
             AI-powered PDF Chatbot: Seamlessly converse with uploaded PDFs, extracting and discussing their content intelligently.
           </p>
           <div className="w-full mt-4">

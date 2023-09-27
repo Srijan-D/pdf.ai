@@ -16,7 +16,7 @@ const ChatComponent = ({ chatId }: Props) => {
     const { data, isLoading } = useQuery({
         queryKey: ["chats", chatId],
         queryFn: async () => {
-            const response = await axios.post<Message[]>('/api/create-chat', { chatId })
+            const response = await axios.post<Message[]>('/api/get-messages', { chatId })
             return response.data
         }
     })
@@ -41,7 +41,7 @@ const ChatComponent = ({ chatId }: Props) => {
     return (
         <div
 
-            className="relative max-h-screen overflow-hidden"
+            className="relative max-h-screen overflow-scroll"
             id="message-container"
         >
             {/* header */}

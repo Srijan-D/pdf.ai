@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { eq } from "drizzle-orm";
 import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const signature = req.headers.get("Stripe-Signature") as string;

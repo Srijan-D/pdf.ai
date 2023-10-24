@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 const FileUpload = () => {
   const router = useRouter();
   const [uploading, setUploading] = React.useState(false);
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async ({
       file_key,
       file_name,
@@ -72,7 +72,7 @@ const FileUpload = () => {
         {...getRootProps({})}
       >
         <input type="text" {...getInputProps()} />
-        {uploading || isLoading ? (
+        {uploading || isPending ? (
           <>
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
             <p>GPT is going through your PDF...</p>

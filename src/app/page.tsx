@@ -1,13 +1,15 @@
-import { Button } from "@/components/ui/button"
-import { UserButton, auth } from "@clerk/nextjs"
-import { LogIn } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { UserButton, auth } from "@clerk/nextjs";
+import { LogIn } from "lucide-react";
 import FileUpload from "@/components/ui/FileUpload";
 import { checkSubscription } from "@/lib/subscription";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import Link from 'next/link'
+import Link from "next/link";
 import { chats } from "@/lib/db/schema";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -15,9 +17,9 @@ export default async function Home() {
   const isAuth = !!userId;
   let firstChat;
   if (userId) {
-    firstChat = await db.select().from(chats).where(eq(chats.userId, userId))
+    firstChat = await db.select().from(chats).where(eq(chats.userId, userId));
     if (firstChat) {
-      firstChat = firstChat[0]
+      firstChat = firstChat[0];
     }
   }
 
@@ -30,34 +32,35 @@ export default async function Home() {
             <UserButton afterSignOutUrl="/" />
           </div>
           <div className="flex mt-3">
-            {isAuth && firstChat &&
+            {isAuth && firstChat && (
               <Link href={`/chat/${firstChat.id}`}>
                 <Button className="border-2 "> Go to Chats</Button>
               </Link>
-            }
-            {isAuth &&
+            )}
+            {isAuth && (
               <div className="ml-2">
                 <SubscriptionButton isPro={isPro} />
               </div>
-            }
+            )}
           </div>
           <p className="max-w-xl mt-2 text-base text-slate-700">
-            AI-powered PDF Chatbot: Seamlessly converse with uploaded PDFs, extracting and discussing their content intelligently.
+            AI-powered PDF Chatbot: Seamlessly converse with uploaded PDFs,
+            extracting and discussing their content intelligently.
           </p>
           <div className="w-full mt-4">
             {isAuth ? (
               <FileUpload />
-            ) : <Link href="/sign-in">
-              <Button>
-                Login to get Started!
-                <LogIn className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>}
+            ) : (
+              <Link href="/sign-in">
+                <Button>
+                  Login to get Started!
+                  <LogIn className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }
-
-

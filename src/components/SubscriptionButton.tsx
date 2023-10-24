@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { Button } from "./ui/button";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 
 type Props = { isPro: boolean };

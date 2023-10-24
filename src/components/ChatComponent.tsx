@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { Input } from "./ui/input";
 import MessageList from "./MessageList";
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Message } from "ai";
 

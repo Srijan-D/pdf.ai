@@ -2,16 +2,25 @@
 import React from "react";
 import { Button } from "./ui/button";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 type Props = { isPro: boolean };
 
 const SubscriptionButton = (props: Props) => {
   const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
   const handleSubscription = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/stripe");
-      window.location.href = response.data.url;
+      const response = await fetch("/api/stripe");
+      if (!response.ok) {
+        throw new Error("Error in fetching messages");
+      }
+      const data = (await response.json()) as {
+        url: string;
+      };
+
+      router.push(data.url);
     } catch (error) {
       console.error(error);
     } finally {

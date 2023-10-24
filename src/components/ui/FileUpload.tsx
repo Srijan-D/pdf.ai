@@ -4,7 +4,6 @@ import { uploadToS3 } from "@/lib/s3";
 import { useMutation } from "@tanstack/react-query";
 import { Inbox, Loader2 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -19,11 +18,15 @@ const FileUpload = () => {
       file_key: string;
       file_name: string;
     }) => {
-      const response = await axios.post("/api/create-chat", {
-        file_key,
-        file_name,
+      const response = await fetch("/api/create-chat", {
+        method: "POST",
+        body: JSON.stringify({ file_key, file_name }),
       });
-      return response.data;
+      if (!response.ok) {
+        throw new Error("Error in creating chat");
+      }
+      const data = await response.json();
+      return data;
     },
   });
 

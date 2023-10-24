@@ -3,9 +3,9 @@ import { userSubscriptions } from "@/lib/db/schema";
 import { stripe } from "@/lib/stripe";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const body = await req.text();
     const signature = headers().get("Stripe-Signature") as string;
     let event: Stripe.Event;

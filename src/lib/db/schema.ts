@@ -37,4 +37,4 @@ export const userSubscriptions = pgTable("user_subscriptions", {
 
 // drizzle orm is what interacts with the database
 
-//drizzle kit is used for migrations 
+//drizzle kit is used for migrations  meaning when you change the schema you can run a migration to update the database

@@ -10,25 +10,24 @@ import { eq } from "drizzle-orm";
 export const runtime = "edge";
 
 const config = new Configuration({
-    apiKey: process.env.OPEN_AI_KEY,
+  apiKey: process.env.OPEN_AI_KEY,
 });
 const openai = new OpenAIApi(config);
 
 export async function POST(req: NextRequest) {
-    try {
+  try {
+    const { messages, chatId } = await req.json();
+    const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+    if (_chats.length != 1) {
+      return NextResponse.json({ error: "chat not found" }, { status: 404 });
+    }
+    const fileKey = _chats[0].fileKey;
+    const lastMessage = messages[messages.length - 1];
+    const context = await getContext(lastMessage.content, fileKey);
 
-        const { messages, chatId } = await req.json();
-        const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
-        if (_chats.length != 1) {
-            return NextResponse.json({ error: "chat not found" }, { status: 404 });
-        }
-        const fileKey = _chats[0].fileKey;
-        const lastMessage = messages[messages.length - 1];
-        const context = await getContext(lastMessage.content, fileKey);
-
-        const prompt = {
-            role: "system",
-            content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
+    const prompt = {
+      role: "system",
+      content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
       The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
       AI is a well-behaved and well-mannered individual.
       AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.
@@ -42,41 +41,40 @@ export async function POST(req: NextRequest) {
       AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
       AI assistant will not invent anything that is not drawn directly from the context.
       `,
-        };
+    };
 
-        const response = await openai.createChatCompletion({
-            model: "gpt-3.5-turbo",
-            messages: [
-                prompt,
-                ...messages.filter((message: Message) => message.role === "user"),
-            ],
-            stream: true,
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        prompt,
+        ...messages.filter((message: Message) => message.role === "user"),
+      ],
+      stream: true,
+    });
+    const stream = OpenAIStream(response, {
+      onStart: async () => {
+        // users messages into ddatabase
+        await db.insert(dbMessages).values({
+          chatId,
+          content: lastMessage.content,
+          role: "user",
         });
-        const stream = OpenAIStream(response, {
-            onStart: async () => {
+      },
+      onCompletion: async (completion) => {
+        // ai's messages into database
 
-                // users messages into ddatabase
-                await db.insert(dbMessages).values({
-                    chatId,
-                    content: lastMessage.content,
-                    role: "user",
-                });
-            },
-            onCompletion: async (completion) => {
-
-                // ai's messages into database
-
-                await db.insert(dbMessages).values({
-                    chatId,
-                    content: completion,
-                    role: "system",
-                });
-            },
+        await db.insert(dbMessages).values({
+          chatId,
+          content: completion,
+          role: "system",
         });
-        return new StreamingTextResponse(stream);
-    } catch (error) {
-        return NextResponse.json(
-            { error: "internal server error" }, { status: 500 }
-        )
-    }
+      },
+    });
+    return new StreamingTextResponse(stream);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "internal server error" },
+      { status: 500 }
+    );
+  }
 }

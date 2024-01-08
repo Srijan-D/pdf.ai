@@ -26,7 +26,7 @@ export default async function Home() {
   return (
     <div className="w-screen min-h-screen bg-[conic-gradient(at_right,_var(--tw-gradient-stops))] from-red-900 via-violet-200 to-orange-500">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className="flex flex-col items-center text-center">
+        <div className="flex flex-col items-center text-center ">
           <div className="flex items-center ">
             <h1 className="mr-3 text-5xl font-semibold">Chat with your PDF</h1>
             <UserButton afterSignOutUrl="/" />

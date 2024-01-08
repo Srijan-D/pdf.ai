@@ -17,7 +17,7 @@ export async function downloadFromS3(file_key: string) {
       Key: file_key,
     };
     const obj = await s3.getObject(params).promise();
-    const file_name = `C:/Users/SD/Desktop/temp/pdf-${Date.now()}.pdf`;
+    const file_name = `D:/pdf-${Date.now()}.pdf`;
 
     fs.writeFileSync(file_name, obj.Body as Buffer); // write the file to the temp folder Buffer for Typescript
     return file_name;

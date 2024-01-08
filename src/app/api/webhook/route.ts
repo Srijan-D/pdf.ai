@@ -5,6 +5,9 @@ import { eq } from "drizzle-orm";
 import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
 
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const signature = req.headers.get("Stripe-Signature") as string;

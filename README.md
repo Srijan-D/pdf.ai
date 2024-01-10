@@ -1,4 +1,4 @@
-⚠!!Currently trying to fix an issue being faced in production due to earlier version of pinecone!!
+⚠!!Currently trying to fix an issue being caused due to deployment of edge functions. Althouth the project is working completely fine locally.
 try to replicate the issue by cloning the repository all contributions are welcome
 
 

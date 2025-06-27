@@ -2,12 +2,8 @@
 try to replicate the issue by cloning the repository all contributions are welcome
 
 
-
 <br/>
 
-
-
-![image](https://github.com/Srijan-D/pdf.ai/assets/87586713/d11a3d29-c451-4137-aa69-745f7304dfbe)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

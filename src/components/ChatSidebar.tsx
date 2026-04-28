@@ -18,14 +18,16 @@ const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="w-full h-screen p-4 text-gray-200 bg-gray-900">
+    <div className="w-full h-screen p-4 text-gray-200 bg-gray-900 flex flex-col">
       <Link href="/">
         <Button className="w-full border-dashed border-white border">
           <PlusCircle className="mr-3 h-4 w-4 cursor-pointer" />
           New Chat
         </Button>
       </Link>
-      <div className="flex flex-col gap-2 mt-5">
+
+      {/* SCROLLABLE LIST */}
+      <div className="flex-1 overflow-y-auto mt-5 space-y-2">
         {chats.map((chat) => (
           <Link key={chat.id} href={`/chat/${chat.id}`}>
             <div
@@ -35,22 +37,14 @@ const ChatSidebar = ({ chats, chatId, isPro }: Props) => {
               })}
             >
               <MessageCircle className="mr-2" />
-              <p className="w-full overflow-hidden text-sm truncate whitespace-nowrap text-ellipsis">
-                {chat.pdfName}
-              </p>
+              <p className="w-full truncate text-sm">{chat.pdfName}</p>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-4">
-        <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
-          <Link href="/">Home </Link>
-          <Link href="/">About </Link>
-        </div>
-        <div className="">
-          <SubscriptionButton isPro={isPro} />
-        </div>
+      <div className="pt-4">
+        <SubscriptionButton isPro={isPro} />
       </div>
     </div>
   );

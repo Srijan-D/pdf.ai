@@ -1,5 +1,4 @@
 import { Pinecone } from "@pinecone-database/pinecone";
-import { PineconeClient } from "@pinecone-database/pinecone";
 import { convertToAscii } from "./utils";
 import { getEmbeddings } from "./embeddings";
 
@@ -17,24 +16,19 @@ import { getEmbeddings } from "./embeddings";
 
 export async function getMatchesFromEmbeddings(
   embeddings: number[],
-  fileKey: string
+  fileKey: string,
 ) {
-  const pinecone = new PineconeClient();
-  await pinecone.init({
+  const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY!,
-    environment: process.env.PINECONE_ENVIRONMENT!,
   });
   const index = await pinecone.Index("aipdf");
 
   try {
     const namespace = convertToAscii(fileKey);
-    const queryResult = await index.query({
-      queryRequest: {
-        topK: 5,
-        vector: embeddings,
-        includeMetadata: true,
-        namespace,
-      },
+    const queryResult = await index.namespace(namespace).query({
+      topK: 5,
+      vector: embeddings,
+      includeMetadata: true,
     });
     return queryResult.matches || [];
   } catch (error) {
@@ -46,9 +40,8 @@ export async function getMatchesFromEmbeddings(
 export async function getContext(query: string, fileKey: string) {
   const queryEmbeddings = await getEmbeddings(query);
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
-
   const qualifyingDocs = matches.filter(
-    (match) => match.score && match.score > 0.7
+    (match) => match.score && match.score > 0.1,
   );
 
   type Metadata = {

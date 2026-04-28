@@ -1,6 +1,7 @@
-import { Pinecone, Vector, PineconeRecord } from "@pinecone-database/pinecone";
-import { downloadFromS3 } from "./s3-server";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone";
+// import { downloadFromS3 } from "./s3-server";
+// import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
 import {
   Document,
   RecursiveCharacterTextSplitter,
@@ -8,14 +9,14 @@ import {
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";
 import { convertToAscii } from "./utils";
-
+// import fs from "fs";
+import { getS3Url } from "./s3";
 let pinecone: Pinecone | null = null;
 
 export const getPineconeClient = async () => {
   if (!pinecone) {
     pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY!,
-      environment: process.env.PINECONE_ENVIRONMENT!,
     });
   }
   return pinecone;
@@ -31,12 +32,19 @@ type PDFPage = {
 export async function loadS3IntoPinecone(fileKey: string) {
   //download the pdf from s3
   console.log("downloading from s3...");
-  const file_name = await downloadFromS3(fileKey);
-  if (!file_name) {
-    throw new Error("unable to download file from s3");
-  }
-  const loader = new PDFLoader(file_name);
-  const pages = (await loader.load()) as PDFPage[];
+  // const file_name = await downloadFromS3(fileKey);
+  // if (!file_name) {
+  //   throw new Error("unable to download file from s3");
+   try {
+  // const loader = new PDFLoader(file_name);
+  // const pages = (await loader.load()) as PDFPage[];
+
+    //  fs.unlinkSync(file_name); 
+      // can avoid piping/file disk storage by using webpdfloader path->
+      const response = await fetch(getS3Url(fileKey));
+      const blob = await response.blob();
+      const loader = new WebPDFLoader(blob);
+      const pages = await loader.load() as PDFPage[];
   //now we split the document into smaller segments
   const documents = await Promise.all(pages.map(prepareDocument));
 
@@ -51,6 +59,12 @@ export async function loadS3IntoPinecone(fileKey: string) {
 
   await namespace.upsert(vectors);
   return documents[0];
+} catch (error) {
+  // if (fs.existsSync(file_name)) {
+  //   fs.unlinkSync(file_name);
+  // }
+  throw error;
+}
 }
 
 async function embedDocument(doc: Document) {

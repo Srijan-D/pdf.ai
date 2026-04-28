@@ -74,7 +74,7 @@ const FileUpload = () => {
         className=" border-dashed border-2 border-slate-500  rounded-xl cursor-pointer flex flex-col items-center text-center bg-gray-50 py-8"
         {...getRootProps({})}
       >
-        <input type="text" {...getInputProps()} />
+        <input {...getInputProps()} />
         {uploading || isPending ? (
           <>
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />

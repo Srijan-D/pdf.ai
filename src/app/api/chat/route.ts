@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { chats, messages as dbMessages } from "@/lib/db/schema";
 import { NextRequest } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
 
 export const runtime = "edge";
 
@@ -17,9 +18,19 @@ const openai = new OpenAIApi(config);
 export async function POST(req: NextRequest) {
   try {
     const { messages, chatId } = await req.json();
-    const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+    const { userId } = await auth();
+    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+    const _chats = await db
+      .select()
+      .from(chats)
+      .where(and(eq(chats.id, chatId), eq(chats.userId, userId)));
+
     if (_chats.length != 1) {
-      return NextResponse.json({ error: "chat not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "chat not found or unauthorized" },
+        { status: 404 },
+      );
     }
     const fileKey = _chats[0].fileKey;
     const lastMessage = messages[messages.length - 1];
@@ -44,7 +55,7 @@ export async function POST(req: NextRequest) {
     };
 
     const response = await openai.createChatCompletion({
-      model: "gpt-4-1106-preview",
+      model: "gpt-5.4-mini",
       messages: [
         prompt,
         ...messages.filter((message: Message) => message.role === "user"),
